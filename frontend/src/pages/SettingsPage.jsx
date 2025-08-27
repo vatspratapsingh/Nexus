@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useAuthUser from "../hooks/useAuthUser";
-import { Settings, User, Mail, GraduationCap, Building } from "lucide-react";
+import { Settings, User, Mail, GraduationCap, Building, ShuffleIcon, CameraIcon } from "lucide-react";
+import toast from "react-hot-toast";
 
 const SettingsPage = () => {
   const { authUser } = useAuthUser();
@@ -10,6 +11,7 @@ const SettingsPage = () => {
     email: authUser?.email || "",
     college: authUser?.college || "",
     fieldOfStudy: authUser?.fieldOfStudy || "",
+    profilePics: authUser?.profilePics || "",
   });
 
   const handleInputChange = (e) => {
@@ -20,9 +22,35 @@ const SettingsPage = () => {
     }));
   };
 
+  const handleRandomAvatar = () => {
+    const idx = Math.floor(Math.random() * 100) + 1; // 1-100 included
+    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
+
+    setFormData(prev => ({ ...prev, profilePics: randomAvatar }));
+    toast.success("Random profile picture generated!");
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error("Image size should be less than 5MB");
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFormData(prev => ({ ...prev, profilePics: event.target.result }));
+        toast.success("Image uploaded successfully!");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = () => {
     // TODO: Implement update profile API call
     console.log("Saving profile:", formData);
+    toast.success("Profile updated successfully!");
     setIsEditing(false);
   };
 
@@ -32,6 +60,7 @@ const SettingsPage = () => {
       email: authUser?.email || "",
       college: authUser?.college || "",
       fieldOfStudy: authUser?.fieldOfStudy || "",
+      profilePics: authUser?.profilePics || "",
     });
     setIsEditing(false);
   };
@@ -54,14 +83,44 @@ const SettingsPage = () => {
             
             <div className="space-y-6">
               {/* Profile Picture */}
-              <div className="flex items-center gap-4">
-                <div className="avatar size-20 rounded-full">
-                  <img src={authUser?.profilePics} alt={authUser?.fullName} />
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <div className="size-32 rounded-full bg-base-300 overflow-hidden">
+                  {formData.profilePics ? (
+                    <img
+                      src={formData.profilePics}
+                      alt="Profile Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <CameraIcon className="size-12 text-base-content opacity-40" />
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg">{authUser?.fullName}</h3>
-                  <p className="text-base-content opacity-70">Profile Picture</p>
-                </div>
+
+                {isEditing && (
+                  <div className="flex items-center gap-2">
+                    <button 
+                      type="button" 
+                      onClick={handleRandomAvatar} 
+                      className="btn btn-accent btn-sm"
+                    >
+                      <ShuffleIcon className="size-4 mr-2" />
+                      Generate Random Avatar
+                    </button>
+                    
+                    <label className="btn btn-outline btn-sm cursor-pointer">
+                      <CameraIcon className="size-4 mr-2" />
+                      Upload Image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                )}
               </div>
 
               {/* Form Fields */}
