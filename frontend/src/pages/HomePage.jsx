@@ -1,161 +1,132 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useEffect, useState } from "react";
-import { getOutgoingFriendReqs, getRecommendedUsers, getUserfriends, sendFriendRequest } from "../lib/api.js";
+import { useQuery } from "@tanstack/react-query"
+import { getUserfriends } from "../lib/api.js";
 import { Link } from "react-router";
-import { CheckCircleIcon, MapPinIcon, SchoolIcon, UserIcon, UserPlusIcon } from "lucide-react";
-import FriendCard from "../components/FriendCard.jsx";
-import NoFriendsFound from "../components/NoFriendsFound.jsx";
-import { capitialize } from "../lib/utils.js";
+import { MessageSquare, User, Clock } from "lucide-react";
 
 const HomePage = () => {
-  const queryClient = useQueryClient();
-  const [outgoingRequestsIds,setOutgoingRequestsIds] = useState(new Set());
-
   const {data: friends = [], isLoading: loadingFriends} = useQuery({
     queryKey: ["friends"],
     queryFn: getUserfriends
   })
 
-  const {data: recommendedUsers=[], isLoading: loadingUsers} = useQuery({
-    queryKey: ["users"],
-    queryFn: getRecommendedUsers
-  })
-
-  const {data: outgoingFriendReqs} = useQuery({
-    queryKey: ["outgoingFriendReqs"],
-    queryFn: getOutgoingFriendReqs
-  })
-
-  const {mutate:sendRequestMutation, isPending} = useMutation({
-    mutationFn: sendFriendRequest,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["outgoingFriendReqs"] })
-  })
-
-  useEffect(() => {
-    const outgoingIds = new Set()
-    if(outgoingFriendReqs && outgoingFriendReqs.length > 0){
-      outgoingFriendReqs.forEach((req) => {
-        outgoingIds.add(req.recipient._id)
-      })
-      setOutgoingRequestsIds(outgoingIds)
+  // Mock data for previous chats
+  const previousChats = [
+    {
+      id: "1",
+      friendName: "John Doe",
+      lastMessage: "Hey, how's it going?",
+      timestamp: "2 hours ago",
+      unreadCount: 2,
+      profilePics: "https://avatar.iran.liara.run/public/1.png"
+    },
+    {
+      id: "2", 
+      friendName: "Jane Smith",
+      lastMessage: "Thanks for the help!",
+      timestamp: "1 day ago",
+      unreadCount: 0,
+      profilePics: "https://avatar.iran.liara.run/public/2.png"
     }
-  }, [outgoingFriendReqs])
+  ];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      <div className="container mx-auto space-y-10">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Your Friends</h2>
-          <Link to="/notifications" className="btn btn-outline btn-sm">
-            <UserIcon className="mr-2 size-4" />
-            Friend Requests
-          </Link>
-        </div>
-
-        {/* CONDITION RENDERING FOR FRIENDS */}
-        {loadingFriends ? (
-          <div className="flex justify-center py-12">
-            <span className="loading loading-spinner loading-lg" />
-          </div>
-        ) : friends.length === 0 ? (
-          <NoFriendsFound />
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {friends.map((friend) => (
-              <FriendCard key={friend._id} friend={friend} />
-            ))}
-          </div>
-        )}
-
-        {/* USERS SECTION */}
-        <section>
-          <div className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Meet New People</h2>
-                <p className="opacity-70">
-                  Discover new things and make amazing projects together!
-                </p>
+      <div className="container mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-8">Home</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Previous Chats */}
+          <div className="lg:col-span-2">
+            <div className="card bg-base-200">
+              <div className="card-body">
+                <h2 className="card-title flex items-center gap-2 mb-4">
+                  <MessageSquare className="h-5 w-5" />
+                  Recent Chats
+                </h2>
+                
+                <div className="space-y-3">
+                  {previousChats.map((chat) => (
+                    <Link 
+                      key={chat.id} 
+                      to={`/chat/${chat.id}`}
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+                    >
+                      <div className="avatar size-12 rounded-full">
+                        <img src={chat.profilePics} alt={chat.friendName} />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-semibold truncate">{chat.friendName}</h3>
+                          <span className="text-xs text-base-content opacity-70">
+                            {chat.timestamp}
+                          </span>
+                        </div>
+                        <p className="text-sm text-base-content opacity-70 truncate">
+                          {chat.lastMessage}
+                        </p>
+                      </div>
+                      
+                      {chat.unreadCount > 0 && (
+                        <div className="badge badge-primary badge-sm">
+                          {chat.unreadCount}
+                        </div>
+                      )}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
-          {loadingUsers ? (
-            <div className="flex justify-center py-12">
-              <span className="loading loading-spinner loading-lg" />
-            </div>
-          ) : recommendedUsers.length === 0 ? (
-            <div className="card bg-base-200 p-6 text-center">
-              <h3 className="font-semibold text-lg mb-2">No Recommendations Available</h3>
-              <p className="text-base-content opacity-70">
-                Check back later for new friends!
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recommendedUsers.map((user) => {
-                const hasRequestBeenSent = outgoingRequestsIds.has(user._id);
-
-                return (
-                  <div
-                    key={user._id}
-                    className="card bg-base-200 hover:shadow-lg transition-all duration-300"
-                  >
-                    <div className="card-body p-5 space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="avatar size-16 rounded-full">
-                          <img src={user.profilePics} alt={user.fullName} />
-                        </div>
-
-                        <div>
-                          <h3 className="font-semibold text-lg">{capitialize(user.fullName)}</h3>
-                          {user.location && (
-                            <div className="flex items-center text-xs opacity-70 mt-1">
-                              <MapPinIcon className="size-3 mr-1" />
-                              {user.location}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1.5">
-                        <span className="badge badge-primary">
-                          College: {capitialize(user.college)}
-                        </span>
-                        <span className="badge badge-secondary">
-                          Domain: {capitialize(user.fieldOfStudy)}
-                        </span>
-                      </div>
-
-                      {user.bio && <p className="text-sm opacity-70">{user.bio}</p>}
-
-                      {/* Action button */}
-                      <button
-                        className={`btn w-full mt-2 ${
-                          hasRequestBeenSent ? "btn-disabled" : "btn-primary"
-                        } `}
-                        onClick={() => sendRequestMutation(user._id)}
-                        disabled={hasRequestBeenSent || isPending}
-                      >
-                        {hasRequestBeenSent ? (
-                          <>
-                            <CheckCircleIcon className="size-4 mr-2" />
-                            Request Sent
-                          </>
-                        ) : (
-                          <>
-                            <UserPlusIcon className="size-4 mr-2" />
-                            Send Friend Request
-                          </>
-                        )}
-                      </button>
+          {/* Online Friends */}
+          <div className="lg:col-span-1">
+            <div className="card bg-base-200">
+              <div className="card-body">
+                <h2 className="card-title flex items-center gap-2 mb-4">
+                  <User className="h-5 w-5" />
+                  Online Friends
+                </h2>
+                
+                <div className="space-y-3">
+                  {loadingFriends ? (
+                    <div className="flex justify-center py-4">
+                      <span className="loading loading-spinner loading-sm" />
                     </div>
-                  </div>
-                );
-              })}
+                  ) : friends.length === 0 ? (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-base-content opacity-70">
+                        No friends online
+                      </p>
+                    </div>
+                  ) : (
+                    friends.slice(0, 5).map((friend) => (
+                      <Link 
+                        key={friend._id} 
+                        to={`/chat/${friend._id}`}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-base-300 transition-colors"
+                      >
+                        <div className="relative">
+                          <div className="avatar size-10 rounded-full">
+                            <img src={friend.profilePics} alt={friend.fullName} />
+                          </div>
+                          <div className="absolute -bottom-1 -right-1 size-3 bg-success rounded-full border-2 border-base-200"></div>
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm truncate">{friend.fullName}</h3>
+                          <p className="text-xs text-base-content opacity-70 truncate">
+                            {friend.college}
+                          </p>
+                        </div>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              </div>
             </div>
-          )}
-        </section>
+          </div>
+        </div>
       </div>
     </div>
   );

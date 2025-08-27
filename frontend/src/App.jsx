@@ -34,7 +34,14 @@ const App = () => {
       <Routes>
         <Route path="/" element={isAuthenticated && isOnboarded ? (
           <Layout showSidebar={true}>
-            <DiscoverPage />
+            <HomePage />
+          </Layout>
+        ) : (
+          <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+        )} />
+        <Route path="/home" element={isAuthenticated && isOnboarded ? (
+          <Layout showSidebar={true}>
+            <HomePage />
           </Layout>
         ) : (
           <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
