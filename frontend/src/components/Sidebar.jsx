@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router"
 import useAuthUser from "../hooks/useAuthUser"
-import { BellIcon, HomeIcon, ShipWheelIcon, UserIcon } from "lucide-react";
+import { BellIcon, HomeIcon, ShipWheelIcon, UserIcon, Settings } from "lucide-react";
 
 const Sidebar = () => {
   const { authUser } = useAuthUser();
@@ -24,7 +24,7 @@ const Sidebar = () => {
             }`}
         >
             <HomeIcon className="size-5 text-base-content opacity-70" />
-            <span>Home</span>
+            <span>Discover</span>
         </Link>
         <Link
             to="/friends"
@@ -48,22 +48,18 @@ const Sidebar = () => {
 
     {/* USER PROFILE SECTION */}
     <div className="p-4 border-t border-base-300 mt-auto">
-        <div className="flex items-center gap-3">
-            <div className="avatar">
-                <div className="w-10 rounded-full">
-                    <img src={authUser?.profilePics} alt="User Avatar" />
-                </div>
+        <Link to="/settings" className="flex items-center gap-3 p-3 rounded-lg hover:bg-base-300 transition-colors">
+            <div className="avatar size-10 rounded-full">
+                <img src={authUser?.profilePics} alt={authUser?.fullName} />
             </div>
-            <div className="flex-1">
-                <p className="font-semibold text-sm">{authUser?.fullName}</p>
-                <p className="text-xs text-success flex items-center gap-1">
-                    <span className="size-2 rounded-full bg-success inline-block"/>
-                    Online
-                </p>
+            <div className="flex-1 min-w-0">
+                <h3 className="font-semibold truncate">{authUser?.fullName}</h3>
+                <p className="text-sm text-base-content opacity-70 truncate">{authUser?.email}</p>
             </div>
-        </div>
+            <Settings className="size-4 text-base-content opacity-70" />
+        </Link>
     </div>
-  </aside>
+</aside>
 }
 
 export default Sidebar
