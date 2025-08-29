@@ -53,6 +53,13 @@ const App = () => {
         ) : (
           <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
         )} />
+        <Route path="/discover" element={isAuthenticated && isOnboarded ? (
+          <Layout showSidebar={true}>
+            <DiscoverPage />
+          </Layout>
+        ) : (
+          <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+        )} />
         <Route path="/settings" element={isAuthenticated && isOnboarded ? (
           <Layout showSidebar={true}>
             <SettingsPage />
