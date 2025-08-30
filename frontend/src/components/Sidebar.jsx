@@ -1,11 +1,13 @@
 import { Link, useLocation } from "react-router"
 import useAuthUser from "../hooks/useAuthUser"
 import { BellIcon, HomeIcon, ShipWheelIcon, UserIcon, Settings, UsersIcon } from "lucide-react";
+import { getCurrentTabId } from "../lib/axios";
 
 const Sidebar = () => {
   const { authUser } = useAuthUser();
   const location = useLocation();
   const currentPath = location.pathname;
+  const tabId = getCurrentTabId();
 
   return <aside className="w-64 bg-base-200 border-r border-base-300 hidden lg:flex flex-col h-screen sticky top-0">
     <div className="p-5 border-b border-base-300">
@@ -15,6 +17,10 @@ const Sidebar = () => {
                 NEXUS
             </span>
         </Link>
+        {/* Debug info - remove this later */}
+        <div className="text-xs text-gray-500 mt-2">
+          Tab: {tabId?.substring(0, 10)}...
+        </div>
     </div>
     <nav className="flex-1 p-4 space-y-1">
         <Link

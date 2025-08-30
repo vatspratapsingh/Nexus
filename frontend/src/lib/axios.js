@@ -13,7 +13,9 @@ const getTabId = () => {
 // Get tab-specific auth token
 const getAuthToken = () => {
   const tabId = getTabId();
-  return localStorage.getItem(`authToken_${tabId}`);
+  const token = localStorage.getItem(`authToken_${tabId}`);
+  console.log(`[Tab ${tabId.substring(0, 10)}] Getting auth token:`, token ? 'Found' : 'Not found');
+  return token;
 };
 
 // Set tab-specific auth token
@@ -21,8 +23,10 @@ const setAuthToken = (token) => {
   const tabId = getTabId();
   if (token) {
     localStorage.setItem(`authToken_${tabId}`, token);
+    console.log(`[Tab ${tabId.substring(0, 10)}] Set auth token`);
   } else {
     localStorage.removeItem(`authToken_${tabId}`);
+    console.log(`[Tab ${tabId.substring(0, 10)}] Cleared auth token`);
   }
 };
 
