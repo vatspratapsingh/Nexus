@@ -40,7 +40,7 @@ const CallPage = () => {
     const initCall = async () => {
       if(!tokenData.token || !authUser || !callId)  return;
       try {
-        console.log("Initializing Stream Video Client...");
+    
 
         const user = {
           id: authUser._id,
@@ -58,7 +58,7 @@ const CallPage = () => {
 
         await callInstance.join({create: true})
 
-        console.log("Joined Call Successfully")
+
 
         setClient(videoClient)
         setCall(callInstance)

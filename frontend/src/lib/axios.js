@@ -15,7 +15,7 @@ const getTabId = () => {
     
     // Store it for this tab session
     sessionStorage.setItem('currentTabId', tabId);
-    console.log(`[NEW TAB] Generated new tab ID: ${tabId.substring(0, 15)}...`);
+
   }
   
   return tabId;
@@ -25,7 +25,7 @@ const getTabId = () => {
 const getAuthToken = () => {
   const tabId = getTabId();
   const token = localStorage.getItem(`authToken_${tabId}`);
-  console.log(`[Tab ${tabId.substring(0, 15)}] Getting auth token:`, token ? 'Found' : 'Not found');
+
   return token;
 };
 
@@ -34,10 +34,10 @@ const setAuthToken = (token) => {
   const tabId = getTabId();
   if (token) {
     localStorage.setItem(`authToken_${tabId}`, token);
-    console.log(`[Tab ${tabId.substring(0, 15)}] Set auth token`);
+
   } else {
     localStorage.removeItem(`authToken_${tabId}`);
-    console.log(`[Tab ${tabId.substring(0, 15)}] Cleared auth token`);
+    
   }
 };
 
@@ -70,7 +70,7 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401 && 
         (error.response?.data?.message?.includes('Invalid Token') || 
          error.response?.data?.message?.includes('User not found'))) {
-      console.log('[AUTH] Clearing token due to invalid auth');
+
       setAuthToken(null);
     }
     return Promise.reject(error);

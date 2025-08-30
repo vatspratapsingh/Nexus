@@ -17,10 +17,7 @@ const Sidebar = () => {
                 NEXUS
             </span>
         </Link>
-        {/* Debug info - remove this later */}
-        <div className="text-xs text-gray-500 mt-2">
-          Tab: {tabId?.substring(0, 10)}...
-        </div>
+
     </div>
     <nav className="flex-1 p-4 space-y-1">
         <Link

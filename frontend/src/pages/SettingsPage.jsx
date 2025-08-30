@@ -49,7 +49,7 @@ const SettingsPage = () => {
 
   const handleSave = () => {
     // TODO: Implement update profile API call
-    console.log("Saving profile:", formData);
+
     toast.success("Profile updated successfully!");
     setIsEditing(false);
   };
