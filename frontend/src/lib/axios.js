@@ -2,19 +2,30 @@ import axios from "axios";
 
 const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001/api" : "/api";
 
-// Generate a unique tab ID
+// Generate a unique tab ID that persists for the tab session
 const getTabId = () => {
-  if (!sessionStorage.getItem('tabId')) {
-    sessionStorage.setItem('tabId', `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  // Check if we already have a tab ID for this session
+  let tabId = sessionStorage.getItem('currentTabId');
+  
+  if (!tabId) {
+    // Generate a new unique tab ID
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substr(2, 9);
+    tabId = `tab_${timestamp}_${random}`;
+    
+    // Store it for this tab session
+    sessionStorage.setItem('currentTabId', tabId);
+    console.log(`[NEW TAB] Generated new tab ID: ${tabId.substring(0, 15)}...`);
   }
-  return sessionStorage.getItem('tabId');
+  
+  return tabId;
 };
 
 // Get tab-specific auth token
 const getAuthToken = () => {
   const tabId = getTabId();
   const token = localStorage.getItem(`authToken_${tabId}`);
-  console.log(`[Tab ${tabId.substring(0, 10)}] Getting auth token:`, token ? 'Found' : 'Not found');
+  console.log(`[Tab ${tabId.substring(0, 15)}] Getting auth token:`, token ? 'Found' : 'Not found');
   return token;
 };
 
@@ -23,10 +34,10 @@ const setAuthToken = (token) => {
   const tabId = getTabId();
   if (token) {
     localStorage.setItem(`authToken_${tabId}`, token);
-    console.log(`[Tab ${tabId.substring(0, 10)}] Set auth token`);
+    console.log(`[Tab ${tabId.substring(0, 15)}] Set auth token`);
   } else {
     localStorage.removeItem(`authToken_${tabId}`);
-    console.log(`[Tab ${tabId.substring(0, 10)}] Cleared auth token`);
+    console.log(`[Tab ${tabId.substring(0, 15)}] Cleared auth token`);
   }
 };
 
@@ -67,7 +78,7 @@ axiosInstance.interceptors.response.use(
 window.addEventListener('beforeunload', () => {
   const tabId = getTabId();
   localStorage.removeItem(`authToken_${tabId}`);
-  sessionStorage.removeItem('tabId');
+  sessionStorage.removeItem('currentTabId');
 });
 
 // Export functions for manual token management
