@@ -226,9 +226,6 @@ VITE_STREAM_API_KEY=your-stream-api-key
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -237,13 +234,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **DaisyUI** for beautiful UI components
 - **Tailwind CSS** for utility-first styling
 - **Render** for hosting and deployment
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-- Create an issue on GitHub
-- Check the deployment logs on Render
-- Verify environment variables are set correctly
 
 ---
 
