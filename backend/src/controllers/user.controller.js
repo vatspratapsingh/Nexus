@@ -140,3 +140,30 @@ export async function getOutgoingFriendReqs(req, res) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export async function getRecentConversations(req, res) {
+    try {
+        const user = await User.findById(req.user.id).populate({
+            path: 'friends',
+            select: 'fullName profilePics college fieldOfStudy'
+        });
+
+        // For now, return friends as recent conversations
+        // In a real app, you'd query actual chat messages from Stream or your database
+        const recentConversations = user.friends.map(friend => ({
+            id: friend._id,
+            friendName: friend.fullName,
+            lastMessage: "Click to start a conversation", // Placeholder
+            timestamp: new Date().toISOString(),
+            unreadCount: 0,
+            profilePics: friend.profilePics,
+            college: friend.college,
+            fieldOfStudy: friend.fieldOfStudy
+        }));
+
+        res.status(200).json(recentConversations);
+    } catch (error) {
+        console.error("Error in getRecentConversations controller ", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}

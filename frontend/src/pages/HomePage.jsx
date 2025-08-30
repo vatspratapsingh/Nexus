@@ -1,12 +1,17 @@
 import { useQuery } from "@tanstack/react-query"
-import { getUserfriends } from "../lib/api.js";
+import { getUserfriends, getRecentConversations } from "../lib/api.js";
 import { Link } from "react-router";
-import { MessageSquare, User } from "lucide-react";
+import { MessageSquare, User, Clock } from "lucide-react";
 
 const HomePage = () => {
   const {data: friends = [], isLoading: loadingFriends} = useQuery({
     queryKey: ["friends"],
     queryFn: getUserfriends
+  })
+
+  const {data: recentConversations = [], isLoading: loadingConversations} = useQuery({
+    queryKey: ["recentConversations"],
+    queryFn: getRecentConversations
   })
 
   return (
@@ -24,12 +29,51 @@ const HomePage = () => {
                   Recent Chats
                 </h2>
                 
-                <div className="text-center py-8">
-                  <MessageSquare className="h-12 w-12 text-base-content opacity-40 mx-auto mb-4" />
-                  <h3 className="font-semibold text-lg mb-2">No Recent Chats</h3>
-                  <p className="text-base-content opacity-70">
-                    Start a conversation with your friends!
-                  </p>
+                <div className="space-y-3">
+                  {loadingConversations ? (
+                    <div className="flex justify-center py-4">
+                      <span className="loading loading-spinner loading-sm" />
+                    </div>
+                  ) : recentConversations.length === 0 ? (
+                    <div className="text-center py-8">
+                      <MessageSquare className="h-12 w-12 text-base-content opacity-40 mx-auto mb-4" />
+                      <h3 className="font-semibold text-lg mb-2">No Recent Chats</h3>
+                      <p className="text-base-content opacity-70">
+                        Start a conversation with your friends!
+                      </p>
+                    </div>
+                  ) : (
+                    recentConversations.map((chat) => (
+                      <Link 
+                        key={chat.id} 
+                        to={`/chat/${chat.id}`}
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+                      >
+                        <div className="avatar size-12 rounded-full">
+                          <img src={chat.profilePics} alt={chat.friendName} />
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold truncate">{chat.friendName}</h3>
+                            <span className="text-xs text-base-content opacity-70 flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {new Date(chat.timestamp).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <p className="text-sm text-base-content opacity-70 truncate">
+                            {chat.lastMessage}
+                          </p>
+                        </div>
+                        
+                        {chat.unreadCount > 0 && (
+                          <div className="badge badge-primary badge-sm">
+                            {chat.unreadCount}
+                          </div>
+                        )}
+                      </Link>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
