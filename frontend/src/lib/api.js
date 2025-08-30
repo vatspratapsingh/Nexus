@@ -16,15 +16,20 @@ export const logout = async () => {
 }
 
 export const getAuthUser = async() => {
-  // const res = await fetch("https://jsonplaceholder.typicode.com/todos");
-  // const data = await res.json();
-  // return data;
   try {
     const res = await axiosInstance.get("/auth/me");
     return res.data;
   } catch (error) {
     console.log("Error in getAuthUser: ", error)
-    return null;
+    
+    // Only return null for actual auth errors, not network issues
+    if (error.response?.status === 401) {
+      return null; // User is not authenticated
+    }
+    
+    // For other errors (network, server issues), throw the error
+    // This will trigger the retry logic in useQuery
+    throw error;
   }
 }
 

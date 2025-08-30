@@ -66,8 +66,11 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Clear token on auth errors
-    if (error.response?.status === 401) {
+    // Only clear token on specific auth errors, not all 401s
+    if (error.response?.status === 401 && 
+        (error.response?.data?.message?.includes('Invalid Token') || 
+         error.response?.data?.message?.includes('User not found'))) {
+      console.log('[AUTH] Clearing token due to invalid auth');
       setAuthToken(null);
     }
     return Promise.reject(error);
