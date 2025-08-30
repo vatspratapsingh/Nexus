@@ -78,11 +78,15 @@ const ChatPage = () => {
     if(channel) {
       const callUrl = `${window.location.origin}/call/${channel.id}`
 
+      // Send message to chat
       channel.sendMessage({
-        text: `I've stated a video call. Join me here: ${callUrl}`,
+        text: `I've started a video call. Join me here: ${callUrl}`,
       })
 
-      toast.success("Video call link sent successfully!");
+      // Open video call in a new tab
+      window.open(callUrl, '_blank', 'noopener,noreferrer');
+
+      toast.success("Video call started! Opening in new tab...");
     }
   };
 
