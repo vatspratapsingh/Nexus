@@ -15,6 +15,10 @@ export const protectRoute = async (req, res, next) => {
             return res.status(401).json({ message: "Unauthorized - No token provided" });
         }
 
+        // Log token info for debugging (remove in production)
+        console.log("Token received:", token.substring(0, 20) + "...");
+        console.log("JWT_SECRET_KEY exists:", !!process.env.JWT_SECRET_KEY);
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
         if(!decoded){
@@ -31,7 +35,16 @@ export const protectRoute = async (req, res, next) => {
 
         next();
     } catch (error) {
-        console.log("Error in protected middleware", error);
+        console.log("Error in protected middleware", error.message);
+        
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: "Unauthorized - Invalid token signature" });
+        }
+        
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: "Unauthorized - Token expired" });
+        }
+        
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
